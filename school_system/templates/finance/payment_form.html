@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Record payment{% endblock %}
+{% block eyebrow %}Fees and collections{% endblock %}
+{% block page_title %}Record payment{% endblock %}
+{% block content %}
+<form method="post" class="form-layout narrow">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <section class="form-card"><div class="form-card-heading"><span>01</span><div><h2>Payment details</h2><p>A numbered receipt will be created automatically.</p></div></div>
+    <div class="form-grid">
+      <div class="field full"><label for="student_id">Student <b>*</b></label><select id="student_id" name="student_id" required><option value="">Select a student</option>{% for student in students %}<option value="{{ student.id }}" {{ 'selected' if selected_student == student.id }}>{{ student.first_name }} {{ student.last_name }} · {{ student.admission_number }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="amount">Amount (KES) <b>*</b></label><input id="amount" name="amount" type="number" min="1" step="1" value="{{ request.form.amount or '' }}" placeholder="10000" required></div>
+      <div class="field"><label for="paid_on">Payment date <b>*</b></label><input id="paid_on" name="paid_on" type="date" value="{{ request.form.paid_on or today }}" required></div>
+      <div class="field"><label for="method">Method <b>*</b></label><select id="method" name="method">{% for method in ('M-PESA', 'Cash', 'Bank', 'Cheque') %}<option {{ 'selected' if request.form.method == method }}>{{ method }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="reference">Reference</label><input id="reference" name="reference" value="{{ request.form.reference or '' }}" placeholder="M-PESA or bank reference"></div>
+      <div class="field full"><label for="notes">Notes</label><textarea id="notes" name="notes" rows="3" placeholder="Optional payment note">{{ request.form.notes or '' }}</textarea></div>
+    </div>
+  </section>
+  <div class="form-actions"><a class="button secondary" href="{{ url_for('finance.index') }}">Cancel</a><button class="button primary" type="submit">Record & create receipt</button></div>
+</form>
+{% endblock %}

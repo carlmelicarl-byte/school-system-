@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Receipt {{ payment.receipt_number }}{% endblock %}
+{% block eyebrow %}Official receipt{% endblock %}
+{% block page_title %}{{ payment.receipt_number }}{% endblock %}
+{% block topbar_actions %}<button class="button primary compact no-print" type="button" onclick="window.print()">Print receipt</button>{% endblock %}
+{% block content %}
+<div class="receipt-actions no-print"><a class="text-link" href="{{ url_for('finance.index') }}">← Back to finance</a></div>
+<article class="receipt">
+  <header class="receipt-header">
+    <div class="receipt-logo">E</div>
+    <div><p class="receipt-school">{{ school_name }}</p><span>{{ school_motto }}</span><small>Official school fee receipt</small></div>
+    <div class="receipt-number"><span>Receipt number</span><strong>{{ payment.receipt_number }}</strong><small>{{ payment.paid_on | pretty_date }}</small></div>
+  </header>
+  <div class="receipt-rule"><span>PAYMENT RECEIPT</span></div>
+  <section class="receipt-to">
+    <div><span>Received from</span><strong>{{ payment.guardian_name }}</strong></div>
+    <div><span>For student</span><strong>{{ payment.student_name }}</strong><small>{{ payment.admission_number }} · {{ payment.class_name or 'Not assigned' }}</small></div>
+  </section>
+  <section class="receipt-amount"><span>Amount received</span><strong>{{ payment.amount | money }}</strong><p>Paid via {{ payment.method }}{% if payment.reference %} · Reference {{ payment.reference }}{% endif %}</p></section>
+  <dl class="receipt-details">
+    <div><dt>Payment date</dt><dd>{{ payment.paid_on | pretty_date }}</dd></div>
+    <div><dt>Recorded by</dt><dd>{{ payment.recorded_by_name or 'School office' }}</dd></div>
+    <div><dt>Total billed</dt><dd>{{ totals.billed | money }}</dd></div>
+    <div><dt>Balance after payment</dt><dd>{{ (totals.billed - totals.paid) | money }}</dd></div>
+    {% if payment.notes %}<div class="wide"><dt>Notes</dt><dd>{{ payment.notes }}</dd></div>{% endif %}
+  </dl>
+  <footer class="receipt-footer"><div><span></span><small>Authorised signature</small></div><p>Thank you. This receipt was generated electronically by ElimuPro.</p></footer>
+</article>
+{% endblock %}

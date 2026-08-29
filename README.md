@@ -1,140 +1,125 @@
-# 🏫 ElimuPro — School Management System
+# ElimuPro
 
-A complete, professional school management platform modelled on **Zeraki** (Analytics, Finance) and **SmartShule** — built for the Kenyan school system (CBC Junior Secondary + KCSE-style grading). Runs locally with **Flask + SQLite** and a modern web dashboard. No external services required.
+A fresh, practical foundation for a Kenyan school management system. This version is intentionally small, structured, and easy to extend: Flask handles server-rendered pages and authentication, while SQLite keeps local development simple.
 
----
+## What is included
 
-## ▶️ Run it
+- Secure session authentication with CSRF protection
+- Administrator, teacher, and bursar roles
+- School overview with enrolment, attendance, capacity, and fee metrics
+- Student directory with search and filters
+- Student admission, profile, editing, and class placement
+- Class directory and capacity management
+- Fee invoices, student balances, payments, and printable receipts
+- Activity audit trail
+- Responsive interface with no frontend framework or CDN dependency
+- Deterministic demo data and an automated test suite
+
+The rebuild deliberately leaves attendance entry and academic assessment as the next modules instead of carrying forward the previous monolithic implementation.
+
+## Technology
+
+- Python 3.11+
+- Flask 3
+- SQLite
+- Jinja templates
+- Plain CSS and JavaScript
+- Pytest
+
+## Quick start
 
 ```bash
-cd school_system
-pip install flask          # only dependency
-python3 seed.py            # initialise the database with sample school data
-python3 app.py             # start server → http://localhost:8000
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python seed.py
+python app.py
 ```
 
-### Default accounts (create your own in Settings → Users)
+Open [http://localhost:8000](http://localhost:8000).
 
-| Role          | Username  | Password      | Access |
-|---------------|-----------|---------------|--------|
-| Administrator | `admin`   | `admin123`    | Full system |
-| Teacher       | `teacher` | `teacher123`  | Academics, marks, attendance, transport register |
-| Accounts      | `accounts`| `accounts123` | Finance & fee management only (students read-only) |
+The app also creates and seeds the local database automatically when it is first started. Run `python seed.py` whenever you explicitly want to reset it to the demonstration dataset.
 
-Change passwords after first login via **My Account** (click your name in the top-right).
+## Demo accounts
 
----
+| Role | Email | Password |
+| --- | --- | --- |
+| Administrator | `admin@school.local` | `ChangeMe123!` |
+| Teacher | `teacher@school.local` | `Teacher123!` |
+| Bursar | `bursar@school.local` | `Bursar123!` |
 
-## ✨ Modules
+These accounts are for local development only. Change or remove them before deployment.
 
-### 📊 Dashboard
-- Personalised **welcome banner** with quick actions (add student, record payment, enter marks, announce)
-- **Needs attention** list — unplaced students, open exams, critical fee balances — role-aware
-- Live **activity feed** (audit trail of everything that happens in the school)
-- Fee collection: year & term billed / collected / arrears, per-class bars
-- Latest exam performance, grade distribution, subject & class means, trend across terms
-- Transport summary, recent payments, announcements
+## Project structure
 
-### 👨‍🎓 Students
-- Full admission records with **profile pictures**
-- Add / edit / view profile, class placement, parent contacts, fee summary, payment history, transport route
-- **Bulk CSV import** (paste rows: name, gender, class, parent) with a per-line error report
-- **Class promotion** — move an entire class to the next grade in one click
-- Per-student performance snapshot → **Report Card** / **Analytics** shortcuts
-- Search, filters, CSV export
-
-### 👩‍🏫 Teachers · 🏛 Classes · 📚 Subjects
-- Teacher registry (TSC no, subject, phone, email, employment type, **photo**)
-- **Classes from Grade 1 to Grade 12** — add, **edit** (name, grade, stream, capacity, class teacher) or **remove** a class (removal cleans up its timetable, fee structures, enrollments & attendance)
-- Class streams with class teacher and capacity usage
-- Subjects with categories and subject teachers
-
-### 📝 Exams & Marks Entry
-- Create exams by term; open/close status
-- Spreadsheet-style marks entry per class — live mean & grade, dirty-change tracking, bulk save
-- KCSE 12-point grading: A (80+) → A- → B+ → … → E
-
-### 📈 Analytics
-- Overall mean, top student, best class, grade distribution, gender performance
-- Subject means (high/low), class comparison, performance trend
-- Top-10 leaderboard + searchable full results, CSV export
-- Per-student: subject breakdown vs class mean, class rank, trend
-
-### 🖨 Report Cards
-- Printable A4 report card with school logo, grades, points, mean grade, class position, signatures → **Print / save as PDF**
-- **Per-student teacher comments** — saved per exam and shown on the printed card
-
-### 🕐 Timetable *(Zeraki Timetable–style)*
-- Weekly **class timetable**: 8 periods × 5 days with break rows, subject badges & teacher names
-- **Teacher timetable** view with weekly teaching load per teacher
-- Click-any-cell assignment with automatic subject-teacher allocation
-- **Conflict detection** — a teacher can never be double-booked in two classes at the same slot (server-enforced); conflicting cells highlighted red
-- Printable grids
-
-### 💰 Finance & Fees *(Administrator + Accounts)*
-- **Payment types** — every payment is categorised (Tuition Fees, Transport, Examination Fee, Uniform, Library, Sports…); administrators can **add any payable item** with a category and default amount, and activate/deactivate them
-- Per-class fee structures per term; **transport fees auto-added** for route riders
-- Student fee ledger: billed / paid / balance, Cleared / Partial / Critical status
-- Record **or edit** payments — choose payment type, M-PESA / Cash / Bank / Cheque, auto receipt numbers
-- **Collections by payment type** charts (amount + count per type)
-- **Professional printable receipts** with school badge/logo, receipt number, payment type, amount in words, balance, signature lines — auto-opens after every payment, re-printable and editable from the payments list
-- Itemised statements (Tuition + Transport per term), SMS fee reminders to parents in arrears
-
-### 🚌 Transport
-- Routes with drivers, capacity, pickup/drop-off times and **per-term fees**
-- Rider assignments (bulk tick from any class; one route per student)
-- Daily boarding register (morning / evening, Boarded / Not Boarded / Excused)
-- Route summaries + monthly transport fee totals
-
-### 📅 Attendance
-- Daily class register (Present / Absent / Late / Permission), one-click marking
-- Year-to-date summary with daily rates
-
-### 📣 Communication
-- Announcements published to parents & staff with SMS queue
-- Message centre: fee reminders + announcement SMS log with delivery status
-
-### ⚙️ Settings
-- **School** — name, motto, address, contacts, academic year, term, **term dates**, currency, **logo upload**
-- **Appearance** — 6 colour themes / wallpapers, font family (Modern / Humanist / Serif / Mono), base font size — applied instantly
-- **Users** — create accounts (Administrator / Teacher / Accounts), reset passwords, activate/deactivate
-- **SMS Gateway** — provider configuration (Africa's Talking, Daraja, Twilio, Infobip)
-
-### ✨ Craft & polish
-- **Activity feed / audit trail** on the dashboard records every key action (admissions, payments, imports, promotions, announcements…)
-- Skeleton loading screens, friendly empty states, toast notifications with icons
-- **Esc** closes modals; role-aware menus and alerts; version footer
-
-### 👤 My Account (all roles)
-- Upload your own profile picture (shown in the top bar)
-- Change your password
-
----
-
-## 🗂 Tech & architecture
-
-```
-school_system/
-├── app.py            # Flask backend — REST API, role-based auth, analytics & billing engine
-├── seed.py           # schema + realistic sample data generator
-├── school.db         # SQLite database (auto-created by seed.py)
-├── templates/index.html
-└── static/
-    ├── css/style.css # design system, themes, print styles
-    ├── js/app.js     # SPA: routing, 15 views, SVG charts (no CDN)
-    └── uploads/      # profile pictures & logos (auto-created)
+```text
+.
+├── app.py                         # Development entry point
+├── seed.py                        # Reset and seed the local database
+├── requirements.txt
+├── school_system/
+│   ├── __init__.py                # Application factory
+│   ├── auth.py                    # Authentication blueprint
+│   ├── dashboard.py               # Overview blueprint
+│   ├── students.py                # Student records blueprint
+│   ├── academics.py               # Classes blueprint
+│   ├── finance.py                 # Invoices, payments, receipts
+│   ├── db.py                      # SQLite connection, CLI, demo seed
+│   ├── security.py                # Access control and CSRF helpers
+│   ├── schema.sql
+│   ├── static/
+│   └── templates/
+└── tests/
 ```
 
-- **No internet/CDN needed** — charts are hand-drawn SVG, fonts are system stacks
-- **Role-based access enforced server-side** (Administrator / Teacher / Accounts)
-- Token + cookie authentication — works in normal browsers and embedded previews
-- REST API is ready to plug into real integrations (M-Pesa Daraja STK push, Africa's Talking SMS)
+## Database commands
 
-## 🔌 Real-world upgrades (next steps)
-- **M-Pesa Daraja API** — live STK-push payments instead of manual recording
-- **Africa's Talking SMS** — connect the gateway for real message delivery
-- Multi-school tenancy (`school_id`) for a Zeraki-style SaaS deployment
-- Parent mobile portal
+Reset to an empty schema:
 
-## 🔐 Security notes
-Demo secret key and SHA-256 password hashes suit a local deployment. For production: rotate the secret key via environment variable, use HTTPS, and consider bcrypt/argon2 hashing.
+```bash
+flask --app app init-db
+```
+
+Reset and include demo records:
+
+```bash
+flask --app app init-db --with-demo
+```
+
+The local database is stored at `instance/school.sqlite3` and is ignored by Git.
+
+## Run tests
+
+```bash
+pytest
+```
+
+GitHub Actions runs the same suite on every push and pull request.
+
+## Configuration
+
+Copy `.env.example` values into your deployment environment. Flask does not load `.env` without an additional package, so export them through your shell or hosting provider:
+
+```bash
+export SECRET_KEY="a-long-random-production-secret"
+export DATABASE_PATH="/absolute/path/to/school.sqlite3"
+export SESSION_COOKIE_SECURE=true
+```
+
+## Suggested roadmap
+
+1. Attendance entry and daily summaries
+2. Subjects, assessments, marks, and report cards
+3. Staff profiles and teaching assignments
+4. Configurable fee structures and bulk invoicing
+5. Parent portal and notifications
+6. PostgreSQL plus migrations for hosted deployments
+7. Multi-school tenancy only after the single-school workflow is stable
+
+## Production notes
+
+- Set a unique `SECRET_KEY` and enable secure cookies behind HTTPS.
+- Replace all demo credentials before using real data.
+- Put the database on persistent, backed-up storage.
+- Run Flask behind a production WSGI server such as Gunicorn.
+- Review local privacy and retention requirements before storing learner data.

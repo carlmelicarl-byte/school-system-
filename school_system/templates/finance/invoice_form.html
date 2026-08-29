@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Raise invoice{% endblock %}
+{% block eyebrow %}Fees and collections{% endblock %}
+{% block page_title %}Raise invoice{% endblock %}
+{% block content %}
+<form method="post" class="form-layout narrow">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <section class="form-card"><div class="form-card-heading"><span>01</span><div><h2>Invoice details</h2><p>Add a charge to a learner's fee account.</p></div></div>
+    <div class="form-grid">
+      <div class="field full"><label for="student_id">Student <b>*</b></label><select id="student_id" name="student_id" required><option value="">Select a student</option>{% for student in students %}<option value="{{ student.id }}" {{ 'selected' if selected_student == student.id }}>{{ student.first_name }} {{ student.last_name }} · {{ student.admission_number }}</option>{% endfor %}</select></div>
+      <div class="field full"><label for="description">Description <b>*</b></label><input id="description" name="description" value="{{ request.form.description or '' }}" placeholder="Term tuition and activities" required></div>
+      <div class="field"><label for="amount">Amount (KES) <b>*</b></label><input id="amount" name="amount" type="number" min="0" value="{{ request.form.amount or '' }}" required></div>
+      <div class="field"><label for="due_date">Due date</label><input id="due_date" name="due_date" type="date" value="{{ request.form.due_date or '' }}"></div>
+      <div class="field"><label for="term">Term <b>*</b></label><select id="term" name="term">{% for term in (1, 2, 3) %}<option value="{{ term }}" {{ 'selected' if (request.form.term or current_term) | int == term }}>Term {{ term }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="academic_year">Academic year <b>*</b></label><input id="academic_year" name="academic_year" type="number" min="2020" value="{{ request.form.academic_year or current_year }}" required></div>
+    </div>
+  </section>
+  <div class="form-actions"><a class="button secondary" href="{{ url_for('finance.index') }}">Cancel</a><button class="button primary" type="submit">Add invoice</button></div>
+</form>
+{% endblock %}

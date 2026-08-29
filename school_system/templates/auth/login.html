@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17261f">
+  <title>Sign in · {{ school_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-story">
+      <a class="brand light" href="#">
+        <span class="brand-mark">E</span>
+        <span><strong>ElimuPro</strong><small>School operations, simplified</small></span>
+      </a>
+      <div class="auth-story-copy">
+        <p class="eyebrow light">Built for focused school teams</p>
+        <h1>Everything your school needs to move forward.</h1>
+        <p>One dependable workspace for learners, classes, attendance, and fee collection.</p>
+        <div class="auth-points">
+          <span><b>01</b> Clear learner records</span>
+          <span><b>02</b> Actionable daily insights</span>
+          <span><b>03</b> Accountable fee tracking</span>
+        </div>
+      </div>
+      <p class="auth-quote">“Good systems give educators more time to educate.”</p>
+    </section>
+
+    <section class="auth-form-side">
+      <div class="auth-card">
+        <div class="mobile-brand"><span class="brand-mark">E</span><strong>ElimuPro</strong></div>
+        <p class="eyebrow">Secure workspace</p>
+        <h2>Welcome back</h2>
+        <p class="auth-intro">Sign in to continue to {{ school_name }}.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="inline-alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endwith %}
+
+        <form method="post" class="stack-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" placeholder="you@school.ac.ke" autocomplete="email" required autofocus value="{{ request.form.email or '' }}">
+          <div class="label-row"><label for="password">Password</label><span>School-issued account</span></div>
+          <div class="password-field">
+            <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" data-password-toggle aria-label="Show password">Show</button>
+          </div>
+          <label class="check-row"><input type="checkbox" name="remember"> Keep me signed in on this device</label>
+          <button class="button primary large" type="submit">Sign in <span>→</span></button>
+        </form>
+
+        <div class="demo-credentials">
+          <p>Local demo account</p>
+          <code>admin@school.local</code><span>·</span><code>ChangeMe123!</code>
+        </div>
+      </div>
+      <p class="auth-help">Need access? Contact your school administrator.</p>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
