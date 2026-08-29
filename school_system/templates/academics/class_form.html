@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% set c = class_record or {} %}
+{% block title %}{{ 'Edit class' if class_record else 'Add class' }}{% endblock %}
+{% block eyebrow %}Academic structure{% endblock %}
+{% block page_title %}{{ 'Edit class' if class_record else 'Add class' }}{% endblock %}
+{% block content %}
+<form method="post" class="form-layout narrow">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <section class="form-card">
+    <div class="form-card-heading"><span>01</span><div><h2>Class details</h2><p>Name the class and set its available capacity.</p></div></div>
+    <div class="form-grid">
+      <div class="field full"><label for="name">Class name <b>*</b></label><input id="name" name="name" value="{{ request.form.name or c.name or '' }}" placeholder="Grade 8 South" required></div>
+      <div class="field"><label for="grade">Grade <b>*</b></label><input id="grade" name="grade" type="number" min="1" max="12" value="{{ request.form.grade or c.grade or '' }}" required></div>
+      <div class="field"><label for="stream">Stream <b>*</b></label><input id="stream" name="stream" value="{{ request.form.stream or c.stream or '' }}" placeholder="South" required></div>
+      <div class="field"><label for="capacity">Capacity <b>*</b></label><input id="capacity" name="capacity" type="number" min="1" value="{{ request.form.capacity or c.capacity or 40 }}" required></div>
+      <div class="field"><label for="class_teacher">Class teacher</label><input id="class_teacher" name="class_teacher" value="{{ request.form.class_teacher or c.class_teacher or '' }}" placeholder="Teacher's full name"></div>
+    </div>
+  </section>
+  <div class="form-actions"><a class="button secondary" href="{{ url_for('academics.index') }}">Cancel</a><button class="button primary" type="submit">{{ 'Save changes' if class_record else 'Create class' }}</button></div>
+</form>
+{% endblock %}

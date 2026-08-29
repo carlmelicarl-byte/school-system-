@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
+{% block eyebrow %}Student profile · {{ student.admission_number }}{% endblock %}
+{% block page_title %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
+{% block topbar_actions %}{% if g.user.role == 'admin' %}<a class="button secondary compact" href="{{ url_for('students.edit', student_id=student.id) }}">Edit profile</a>{% endif %}{% endblock %}
+{% block content %}
+<div class="profile-banner">
+  <div class="profile-avatar">{{ student.first_name[0] }}{{ student.last_name[0] }}</div>
+  <div class="profile-title"><span class="status {{ student.status | lower }}"><i></i>{{ student.status }}</span><h2>{{ student.first_name }} {{ student.last_name }}</h2><p>{{ student.admission_number }} · {{ student.class_name or 'Class not assigned' }}</p></div>
+  <div class="profile-meta"><span>Joined</span><strong>{{ student.joined_on | pretty_date }}</strong></div>
+</div>
+
+<div class="profile-grid">
+  <section class="panel profile-details">
+    <div class="panel-heading"><div><p class="eyebrow">Learner</p><h3>Personal details</h3></div></div>
+    <dl class="detail-list">
+      <div><dt>Full name</dt><dd>{{ student.first_name }} {{ student.last_name }}</dd></div>
+      <div><dt>Gender</dt><dd>{{ student.gender }}</dd></div>
+      <div><dt>Date of birth</dt><dd>{{ student.date_of_birth | pretty_date }}</dd></div>
+      <div><dt>Class</dt><dd>{{ student.class_name or 'Not assigned' }}</dd></div>
+      <div><dt>Guardian</dt><dd>{{ student.guardian_name }}</dd></div>
+      <div><dt>Guardian phone</dt><dd>{{ student.guardian_phone }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="panel account-card">
+    <div class="panel-heading"><div><p class="eyebrow">Account</p><h3>Fee position</h3></div></div>
+    <div class="account-balance"><span>Outstanding balance</span><strong>{{ (totals.billed - totals.paid) | money }}</strong><small>{{ totals.paid | money }} received of {{ totals.billed | money }}</small></div>
+    <div class="progress-track large"><span style="width: {{ [((totals.paid / totals.billed * 100) if totals.billed else 0), 100] | min }}%"></span></div>
+    {% if g.user.role in ('admin', 'bursar') %}<div class="inline-actions"><a class="button primary" href="{{ url_for('finance.create_payment', student_id=student.id) }}">Record payment</a><a class="button secondary" href="{{ url_for('finance.create_invoice', student_id=student.id) }}">Add invoice</a></div>{% endif %}
+  </section>
+</div>
+
+<section class="panel section-panel">
+  <div class="panel-heading"><div><p class="eyebrow">Transactions</p><h3>Fee statement</h3></div></div>
+  <div class="statement-grid">
+    <div>
+      <h4>Invoices</h4>
+      <div class="mini-list">{% for invoice in invoices %}<div><span><strong>{{ invoice.description }}</strong><small>Term {{ invoice.term }}, {{ invoice.academic_year }} · due {{ invoice.due_date | pretty_date }}</small></span><b>{{ invoice.amount | money }}</b></div>{% else %}<p class="empty-state">No invoices raised.</p>{% endfor %}</div>
+    </div>
+    <div>
+      <h4>Payments</h4>
+      <div class="mini-list">{% for payment in payments %}<div><span><strong>{{ payment.receipt_number }}</strong><small>{{ payment.method }} · {{ payment.paid_on | pretty_date }}</small></span><b class="positive">{{ payment.amount | money }}</b></div>{% else %}<p class="empty-state">No payments recorded.</p>{% endfor %}</div>
+    </div>
+  </div>
+</section>
+{% endblock %}

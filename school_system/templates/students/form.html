@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% set s = student or {} %}
+{% block title %}{{ title }}{% endblock %}
+{% block eyebrow %}Student records{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<form method="post" class="form-layout">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <section class="form-card">
+    <div class="form-card-heading"><span>01</span><div><h2>Learner information</h2><p>Core identity and admission details.</p></div></div>
+    <div class="form-grid">
+      <div class="field"><label for="admission_number">Admission number <b>*</b></label><input id="admission_number" name="admission_number" value="{{ s.admission_number or '' }}" placeholder="EP/2026/013" required></div>
+      <div class="field"><label for="joined_on">Admission date <b>*</b></label><input id="joined_on" name="joined_on" type="date" value="{{ s.joined_on or '' }}" required></div>
+      <div class="field"><label for="first_name">First name <b>*</b></label><input id="first_name" name="first_name" value="{{ s.first_name or '' }}" required></div>
+      <div class="field"><label for="last_name">Last name <b>*</b></label><input id="last_name" name="last_name" value="{{ s.last_name or '' }}" required></div>
+      <div class="field"><label for="gender">Gender <b>*</b></label><select id="gender" name="gender" required><option value="">Select gender</option>{% for option in ('Female', 'Male', 'Other') %}<option {{ 'selected' if s.gender == option }}>{{ option }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="date_of_birth">Date of birth</label><input id="date_of_birth" name="date_of_birth" type="date" value="{{ s.date_of_birth or '' }}"></div>
+    </div>
+  </section>
+
+  <section class="form-card">
+    <div class="form-card-heading"><span>02</span><div><h2>Placement</h2><p>Current class and enrolment status.</p></div></div>
+    <div class="form-grid">
+      <div class="field"><label for="class_id">Class</label><select id="class_id" name="class_id"><option value="">Not assigned</option>{% for class in classes %}<option value="{{ class.id }}" {{ 'selected' if s.class_id == class.id }}>{{ class.name }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="status">Status <b>*</b></label><select id="status" name="status">{% for option in ('Active', 'Graduated', 'Transferred', 'Inactive') %}<option {{ 'selected' if (s.status or 'Active') == option }}>{{ option }}</option>{% endfor %}</select></div>
+    </div>
+  </section>
+
+  <section class="form-card">
+    <div class="form-card-heading"><span>03</span><div><h2>Guardian contact</h2><p>Primary contact for notices and emergencies.</p></div></div>
+    <div class="form-grid">
+      <div class="field"><label for="guardian_name">Guardian name <b>*</b></label><input id="guardian_name" name="guardian_name" value="{{ s.guardian_name or '' }}" required></div>
+      <div class="field"><label for="guardian_phone">Phone number <b>*</b></label><input id="guardian_phone" name="guardian_phone" value="{{ s.guardian_phone or '' }}" placeholder="07XX XXX XXX" required></div>
+    </div>
+  </section>
+
+  <div class="form-actions"><a class="button secondary" href="{{ url_for('students.detail', student_id=s.id) if s.id else url_for('students.index') }}">Cancel</a><button class="button primary" type="submit">{{ 'Save changes' if s.id else 'Admit student' }}</button></div>
+</form>
+{% endblock %}

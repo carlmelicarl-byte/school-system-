@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Overview{% endblock %}
+{% block eyebrow %}Daily command centre{% endblock %}
+{% block page_title %}Good day, {{ g.user.full_name.split()[0] }}{% endblock %}
+{% block topbar_actions %}
+  {% if g.user.role == 'admin' %}<a class="button primary compact" href="{{ url_for('students.create') }}">+ Admit student</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="hero-card">
+  <div>
+    <span class="hero-kicker">TERM {{ term }} · {{ year }}</span>
+    <h2>Your school at a glance.</h2>
+    <p>Monitor enrolment, fee collection, and the latest activity from one calm workspace.</p>
+  </div>
+  <div class="hero-decoration" aria-hidden="true"><span></span><span></span><span></span></div>
+</section>
+
+<section class="metric-grid">
+  <article class="metric-card">
+    <div class="metric-icon sage"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M17 11h6M20 8v6"/></svg></div>
+    <div><p>Active students</p><strong>{{ counts.students }}</strong><small>{{ counts.unassigned }} awaiting class placement</small></div>
+  </article>
+  <article class="metric-card">
+    <div class="metric-icon blue"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
+    <div><p>Active classes</p><strong>{{ counts.classes }}</strong><small>Across junior school</small></div>
+  </article>
+  <article class="metric-card">
+    <div class="metric-icon amber"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M6 15h4"/></svg></div>
+    <div><p>Fees collected</p><strong>{{ finance.paid | money }}</strong><small>{{ ((finance.paid / finance.billed * 100) if finance.billed else 0) | round | int }}% collection rate</small></div>
+  </article>
+  <article class="metric-card">
+    <div class="metric-icon coral"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/><path d="M21 12a9 9 0 1 1-5-7.5"/></svg></div>
+    <div><p>Attendance marked</p><strong>{{ attendance.present or 0 }}/{{ attendance.marked }}</strong><small>{{ attendance_day | pretty_date }}</small></div>
+  </article>
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel finance-panel">
+    <div class="panel-heading">
+      <div><p class="eyebrow">Financial health</p><h3>Term collection</h3></div>
+      {% if g.user.role in ('admin', 'bursar') %}<a href="{{ url_for('finance.index') }}">View ledger →</a>{% endif %}
+    </div>
+    {% set rate = ((finance.paid / finance.billed * 100) if finance.billed else 0) %}
+    <div class="collection-summary">
+      <div class="ring" style="--progress: {{ rate | round | int }}"><span><strong>{{ rate | round | int }}%</strong><small>collected</small></span></div>
+      <div class="collection-values">
+        <div><span>Total billed</span><strong>{{ finance.billed | money }}</strong></div>
+        <div><span>Received</span><strong class="positive">{{ finance.paid | money }}</strong></div>
+        <div><span>Outstanding</span><strong class="warning">{{ (finance.billed - finance.paid) | money }}</strong></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">Capacity</p><h3>Class occupancy</h3></div><a href="{{ url_for('academics.index') }}">All classes →</a></div>
+    <div class="progress-list">
+      {% for class in class_rows %}
+      <div class="progress-item">
+        <div><strong>{{ class.name }}</strong><span>{{ class.enrolled }}/{{ class.capacity }}</span></div>
+        <div class="progress-track"><span style="width: {{ [((class.enrolled / class.capacity) * 100), 100] | min }}%"></span></div>
+      </div>
+      {% else %}<div class="empty-state">No classes have been created yet.</div>{% endfor %}
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">Latest</p><h3>Recent payments</h3></div>{% if g.user.role in ('admin', 'bursar') %}<a href="{{ url_for('finance.create_payment') }}">Record payment →</a>{% endif %}</div>
+    <div class="compact-list">
+      {% for payment in recent_payments %}
+      <div class="compact-row">
+        <span class="list-avatar">{{ payment.student_name[:1] }}</span>
+        <div><strong>{{ payment.student_name }}</strong><small>{{ payment.receipt_number }} · {{ payment.paid_on | pretty_date }}</small></div>
+        <b>{{ payment.amount | money }}</b>
+      </div>
+      {% else %}<div class="empty-state">No payments recorded yet.</div>{% endfor %}
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><div><p class="eyebrow">Audit trail</p><h3>Recent activity</h3></div></div>
+    <div class="timeline">
+      {% for activity in activities %}
+      <div class="timeline-row"><span></span><div><strong>{{ activity.action }}</strong><p>{{ activity.details or 'No details' }}</p><small>{{ activity.full_name or 'System' }} · {{ activity.created_at | pretty_date }}</small></div></div>
+      {% else %}<div class="empty-state">Activity will appear here.</div>{% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}
